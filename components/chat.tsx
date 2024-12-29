@@ -18,7 +18,7 @@ export function Chat() {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex gap-3 mb-4 ${
+              className={`flex gap-3 mb-4 items-center ${
                 message.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
@@ -29,13 +29,13 @@ export function Chat() {
                 </Avatar>
               )}
               <div
-                className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                className={`flex items-center rounded-lg px-4 py-2 max-w-[80%] ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
                 }`}
               >
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
               </div>
               {message.role === "user" && (
                 <Avatar>
