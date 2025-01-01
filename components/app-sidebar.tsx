@@ -2,15 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-import { PlusIcon } from "@/components/icons";
+import { UserNav } from "@/components/user-nav";
+import { PlusIcon, LoaderIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import { Authenticated } from "convex/react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
 import {
   Sidebar,
   SidebarContent,
@@ -20,10 +20,30 @@ import {
   SidebarMenu,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useApiMutation } from "@/hooks/use-api-mutation";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 
-export function AppSidebar() {
+interface NewChatButtonProps {
+  userId: Id<"users">;
+  disabled?: boolean;
+}
+
+export const AppSidebar = ({ userId, disabled }: NewChatButtonProps) => {
   const router = useRouter();
   const { setOpenMobile } = useSidebar();
+  const { mutate, pending } = useApiMutation(api.chats.createChat);
+
+  const onClick = () => {
+    mutate({
+      title: "Untitled",
+      userId,
+      visibility: "private",
+      createdAt: Date.now(),
+    }).then((id) => {
+      router.push(`/chat/${id}`);
+    });
+  };
 
   return (
     <Sidebar className="group-data-[side=left]:border-r-0">
@@ -38,7 +58,7 @@ export function AppSidebar() {
             className="flex flex-row gap-3 items-center"
           >
             <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer">
-              Chatbot
+              Chat
             </span>
           </Link>
           <Tooltip>
@@ -47,24 +67,27 @@ export function AppSidebar() {
                 variant="ghost"
                 type="button"
                 className="p-2 h-fit"
+                disabled={pending || disabled}
                 onClick={() => {
                   setOpenMobile(false);
-                  router.push("/");
-                  router.refresh();
+                  onClick();
                 }}
               >
-                <PlusIcon />
+                {pending ? <LoaderIcon /> : <PlusIcon />}
               </Button>
             </TooltipTrigger>
-            <TooltipContent align="end">New Chat</TooltipContent>
+            <TooltipContent align="end">New chat</TooltipContent>
           </Tooltip>
         </div>
       </SidebarMenu>
       <SidebarContent>
-        <SidebarGroup />
-        <SidebarGroup />
+        {/*        Put the sidebar-history.tsx here>*/}
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <Authenticated>
+          <UserNav />
+        </Authenticated>
+      </SidebarFooter>
     </Sidebar>
   );
-}
+};

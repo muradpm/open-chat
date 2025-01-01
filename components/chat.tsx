@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { useChat } from "ai/react";
 import { MemoizedMarkdown } from "./memoized-markdown";
 import { Button } from "@/components/ui/button";
@@ -7,15 +8,16 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChatHeader } from "@/components/chat-header";
-import { Send } from "lucide-react";
+import { ArrowUpIcon, StopIcon } from "@/components/icons";
 import { useScrollChat } from "@/hooks/use-scroll-chat";
+import { Id } from "@/convex/_generated/dataModel";
 
 export function Chat({
+  id,
   selectedModelId,
-  isReadonly,
 }: {
+  id: Id<"chats">;
   selectedModelId: string;
-  isReadonly: boolean;
 }) {
   const { messages } = useChat({
     id: "chat",
@@ -26,9 +28,9 @@ export function Chat({
 
   return (
     <>
-      <ChatHeader selectedModelId={selectedModelId} isReadonly={isReadonly} />
+      <ChatHeader selectedModelId={selectedModelId} />
 
-      <div className="flex flex-col h-[calc(100vh-3rem)] max-w-3xl mx-auto px-4 space-y-4">
+      <div className="flex flex-col h-[calc(100vh-6rem)] max-w-3xl mx-auto px-4 space-y-4">
         <div className="flex-1">
           <ScrollArea className="h-[calc(100vh-12rem)] p-4" ref={scrollRef}>
             {messages.map((message) => (
@@ -68,39 +70,49 @@ export function Chat({
             ))}
           </ScrollArea>
         </div>
-        <MessageInput
-          selectedModelId={selectedModelId}
-          isReadonly={isReadonly}
-        />
+        <MessageInput selectedModelId={selectedModelId} />
       </div>
     </>
   );
 }
 
-const MessageInput = ({
-  selectedModelId,
-  isReadonly,
-}: {
-  selectedModelId: string;
-  isReadonly: boolean;
-}) => {
-  const { input, handleSubmit, handleInputChange } = useChat({
-    id: "chat",
-    body: { modelId: selectedModelId, isReadonly },
-    experimental_throttle: 50,
-  });
+const MessageInput = memo(
+  ({ selectedModelId }: { selectedModelId: string }) => {
+    const { input, handleSubmit, handleInputChange, isLoading, stop } = useChat(
+      {
+        id: "chat",
+        body: { modelId: selectedModelId },
+        experimental_throttle: 50,
+      }
+    );
 
-  return (
-    <form onSubmit={handleSubmit} className="flex items-center space-x-2">
-      <Input
-        value={input}
-        onChange={handleInputChange}
-        placeholder="Type your message..."
-        className="flex-1"
-      />
-      <Button type="submit" size="icon">
-        <Send className="h-4 w-4" />
-      </Button>
-    </form>
-  );
-};
+    const handleFormSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (isLoading) {
+        stop();
+      } else {
+        handleSubmit(e);
+      }
+    };
+
+    return (
+      <form onSubmit={handleFormSubmit} className="flex items-center space-x-2">
+        <Input
+          value={input}
+          onChange={handleInputChange}
+          placeholder="Send a message..."
+          className="flex-1"
+        />
+        <Button
+          type="submit"
+          size="icon"
+          disabled={input.length === 0 && !isLoading}
+        >
+          {isLoading ? <StopIcon /> : <ArrowUpIcon />}
+        </Button>
+      </form>
+    );
+  },
+  (prevProps, nextProps) =>
+    prevProps.selectedModelId === nextProps.selectedModelId
+);

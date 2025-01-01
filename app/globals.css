@@ -78,6 +78,12 @@ body {
   }
 }
 
+html,
+body,
+:root {
+  height: 100%;
+}
+
 @layer base {
   * {
     @apply border-border;
