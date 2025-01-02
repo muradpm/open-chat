@@ -16,7 +16,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-function PureChatHeader() {
+function PureChatHeader({
+  chatId,
+  selectedModelId,
+}: {
+  chatId: string;
+  selectedModelId: string;
+}) {
   const router = useRouter();
   const { open } = useSidebar();
 

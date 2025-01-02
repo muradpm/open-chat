@@ -1,5 +1,3 @@
-"use client";
-
 import { Message } from "ai";
 import { memo } from "react";
 import { useChat } from "ai/react";
