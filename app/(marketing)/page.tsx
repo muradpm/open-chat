@@ -1,7 +1,11 @@
 import { Hero } from "./_components/hero";
 
 const MarketingPage = () => {
-  return <Hero />;
+  return (
+    <main>
+      <Hero />
+    </main>
+  );
 };
 
 export default MarketingPage;

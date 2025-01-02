@@ -1,9 +1,12 @@
 import { Chat } from "@/components/chat";
+import { ChatHeader } from "@/components/chat-header";
 
-export default function ChatPage() {
+const ChatPage = () => {
   return (
-    <main>
-      <Chat selectedModelId="llama3.2:1b" isReadonly={false} />
-    </main>
+    <>
+      <Chat />
+    </>
   );
-}
+};
+
+export default ChatPage;

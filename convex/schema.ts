@@ -15,15 +15,15 @@ const schema = defineSchema({
     title: v.string(),
     visibility: v.union(v.literal("public"), v.literal("private")),
     createdAt: v.number(),
-    userId: v.id("users"),
+    userId: v.optional(v.id("users")),
   }).index("userId", ["userId"]),
 
-  models: defineTable({
-    id: v.id("models"),
-    label: v.string(),
-    apiIdentifier: v.string(),
-    description: v.string(),
-  }),
+  messages: defineTable({
+    chatId: v.id("chats"),
+    role: v.union(v.literal("user"), v.literal("assistant")),
+    content: v.string(),
+    createdAt: v.number(),
+  }).index("chatId", ["chatId"]),
 });
 
 export default schema;

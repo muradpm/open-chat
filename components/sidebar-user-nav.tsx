@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import { ChevronsUpDown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -23,14 +24,17 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-export const UserNav = () => {
+export const SidebarUserNav = () => {
+  const router = useRouter();
   const { isMobile } = useSidebar();
+  const { setTheme, theme } = useTheme();
   const { signOut } = useAuthActions();
 
   const user = useQuery(api.users.currentUser);
 
   const handleSignOut = () => {
     void signOut();
+    router.push("/");
   };
 
   return (
@@ -50,7 +54,6 @@ export const UserNav = () => {
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user?.name}</span>
-                <span className="truncate text-xs">{user?.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -76,11 +79,11 @@ export const UserNav = () => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Link href="/settings/profile">Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/settings/settings">Settings</Link>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={() => setTheme(theme === "dark" ? "light" : "dark")}
+              >
+                {`Toggle ${theme === "light" ? "dark" : "light"} mode`}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

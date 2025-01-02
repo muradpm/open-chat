@@ -5,7 +5,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 export const createChat = mutation({
   args: {
     title: v.string(),
-    userId: v.id("users"),
+    userId: v.optional(v.id("users")),
     visibility: v.union(v.literal("private"), v.literal("public")),
     createdAt: v.number(),
   },
@@ -57,27 +57,9 @@ export const publishChat = mutation({
   },
 });
 
-export const getAllChats = query({
-  args: { id: v.id("chats") },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (userId === null) {
-      return null;
-    }
-
-    const chat = await ctx.db.get(args.id);
-
-    if (!chat) {
-      return null;
-    }
-
-    return chat;
-  },
-});
-
 export const getUserChats = query({
   args: {
-    userId: v.id("users"),
+    userId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);

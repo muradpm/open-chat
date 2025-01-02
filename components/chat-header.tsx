@@ -16,14 +16,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-function PureChatHeader({ selectedModelId }: { selectedModelId: string }) {
+function PureChatHeader() {
   const router = useRouter();
   const { open } = useSidebar();
 
   const { width: windowWidth } = useWindowSize();
 
   return (
-    <header className="flex sticky top-0 bg-background items-center px-2 md:px-8 py-6 gap-2">
+    <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2">
       <SidebarToggle />
 
       {(!open || windowWidth < 768) && (
@@ -33,7 +33,7 @@ function PureChatHeader({ selectedModelId }: { selectedModelId: string }) {
               variant="outline"
               className="order-2 md:order-1 md:px-2 px-2 md:h-fit ml-auto md:ml-0"
               onClick={() => {
-                router.push("/");
+                router.push("/chat");
                 router.refresh();
               }}
             >
@@ -44,6 +44,11 @@ function PureChatHeader({ selectedModelId }: { selectedModelId: string }) {
           <TooltipContent>New chat</TooltipContent>
         </Tooltip>
       )}
+
+      <ModelSelector
+        selectedModelId={selectedModelId}
+        className="order-1 md:order-2"
+      />
 
       <Unauthenticated>
         <Button
@@ -57,6 +62,4 @@ function PureChatHeader({ selectedModelId }: { selectedModelId: string }) {
   );
 }
 
-export const ChatHeader = memo(PureChatHeader, (prevProps, nextProps) => {
-  return prevProps.selectedModelId === nextProps.selectedModelId;
-});
+export const ChatHeader = memo(PureChatHeader, () => true);

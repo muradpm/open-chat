@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 export const Header = () => {
   return (
     <header>
-      <div className="flex items-center justify-between w-full px-8 py-6">
+      <div className="flex items-center justify-between w-full px-4 py-6">
         <div className="flex items-center space-x-4">
           <Link href="/">
             <Image
