@@ -9,19 +9,19 @@ import { SidebarToggle } from "@/components/sidebar-toggle";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "@/components/icons";
 import { useSidebar } from "@/components/ui/sidebar";
+import { VisibilityType, VisibilitySelector } from "./visibility-selector";
 import { memo } from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Id } from "@/convex/_generated/dataModel";
 
 function PureChatHeader({
   chatId,
   selectedModelId,
+  selectedVisibilityType,
 }: {
-  chatId: string;
+  chatId: string | Id<"chats">;
   selectedModelId: string;
+  selectedVisibilityType: VisibilityType;
 }) {
   const router = useRouter();
   const { open } = useSidebar();
@@ -51,9 +51,12 @@ function PureChatHeader({
         </Tooltip>
       )}
 
-      <ModelSelector
-        selectedModelId={selectedModelId}
-        className="order-1 md:order-2"
+      <ModelSelector selectedModelId={selectedModelId} className="order-1 md:order-2" />
+
+      <VisibilitySelector
+        chatId={chatId}
+        selectedVisibilityType={selectedVisibilityType}
+        className="order-1 md:order-3"
       />
 
       <Unauthenticated>

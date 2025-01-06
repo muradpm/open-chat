@@ -41,10 +41,7 @@ export default function RegisterPage() {
           <UserAuthForm />
           <p className="text-center text-sm text-muted-foreground">
             By signing up, you agree to our{" "}
-            <Link
-              href="/terms"
-              className="hover:text-brand underline underline-offset-4"
-            >
+            <Link href="/terms" className="hover:text-brand underline underline-offset-4">
               Terms
             </Link>{" "}
             and{" "}
@@ -59,10 +56,7 @@ export default function RegisterPage() {
         </div>
       </div>
       <Link href="/chat">
-        <Button
-          variant="ghost"
-          className="absolute right-4 top-4 md:right-8 md:top-6"
-        >
+        <Button variant="ghost" className="absolute right-4 top-4 md:right-2 md:top-2">
           <ChevronLeft className="mr-2 h-4 w-4" />
           Back
         </Button>

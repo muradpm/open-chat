@@ -1,7 +1,7 @@
 import { getAuthUserId, getAuthSessionId } from "@convex-dev/auth/server";
 import { query } from "./_generated/server";
 
-export const currentUser = query({
+export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
@@ -12,7 +12,7 @@ export const currentUser = query({
   },
 });
 
-export const currentSession = query({
+export const getCurrentSession = query({
   args: {},
   handler: async (ctx) => {
     const sessionId = await getAuthSessionId(ctx);

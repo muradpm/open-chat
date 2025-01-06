@@ -30,7 +30,7 @@ export const SidebarUserNav = () => {
   const { setTheme, theme } = useTheme();
   const { signOut } = useAuthActions();
 
-  const user = useQuery(api.users.currentUser);
+  const user = useQuery(api.users.getCurrentUser);
 
   const handleSignOut = () => {
     void signOut();
@@ -87,9 +87,7 @@ export const SidebarUserNav = () => {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut}>
-              Sign out
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
