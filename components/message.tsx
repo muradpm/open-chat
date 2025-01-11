@@ -7,24 +7,17 @@ import { cn } from "@/lib/utils";
 import { SparklesIcon } from "@/components/icons";
 import { MemoizedMarkdown } from "./memoized-markdown";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { PencilEditIcon } from "@/components/icons";
 import { MessageEditor } from "@/components/message-editor";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface PreviewMessageProps {
-  chatId: string;
+  chatId: Id<"chats">;
   message: Message;
   isLoading: boolean;
-  setMessages: (
-    messages: Message[] | ((messages: Message[]) => Message[])
-  ) => void;
-  reload: (
-    chatRequestOptions?: ChatRequestOptions
-  ) => Promise<string | null | undefined>;
+  setMessages: (messages: Message[] | ((messages: Message[]) => Message[])) => void;
+  reload: (chatRequestOptions?: ChatRequestOptions) => Promise<string | null | undefined>;
   isReadonly?: boolean;
 }
 
@@ -111,14 +104,11 @@ const PurePreviewMessage = ({
   );
 };
 
-export const PreviewMessage = memo(
-  PurePreviewMessage,
-  (prevProps, nextProps) => {
-    if (prevProps.isLoading !== nextProps.isLoading) return false;
-    if (prevProps.message.content !== nextProps.message.content) return false;
-    return true;
-  }
-);
+export const PreviewMessage = memo(PurePreviewMessage, (prevProps, nextProps) => {
+  if (prevProps.isLoading !== nextProps.isLoading) return false;
+  if (prevProps.message.content !== nextProps.message.content) return false;
+  return true;
+});
 
 export const ThinkingMessage = () => {
   const role = "assistant";
@@ -142,9 +132,7 @@ export const ThinkingMessage = () => {
         </div>
 
         <div className="flex flex-col gap-2 w-full">
-          <div className="flex flex-col gap-4 text-muted-foreground">
-            Thinking...
-          </div>
+          <div className="flex flex-col gap-4 text-muted-foreground">Thinking...</div>
         </div>
       </div>
     </motion.div>

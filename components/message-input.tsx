@@ -23,6 +23,7 @@ import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { SuggestedActions } from "@/components/suggested-actions";
 import equal from "fast-deep-equal";
+import { Id } from "@/convex/_generated/dataModel";
 
 function PureMessageInput({
   chatId,
@@ -38,7 +39,7 @@ function PureMessageInput({
   handleSubmit,
   className,
 }: {
-  chatId: string;
+  chatId: Id<"chats">;
   input: string;
   setInput: (value: string) => void;
   isLoading: boolean;

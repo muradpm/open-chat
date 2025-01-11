@@ -1,12 +1,11 @@
 "use client";
 
+import type { User } from "@auth/core/types";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { SidebarUserNav } from "@/components/sidebar-user-nav";
 import { PlusIcon } from "@/components/icons";
+import { SidebarHistory } from "@/components/sidebar-history";
+import { SidebarUserNav } from "@/components/sidebar-user-nav";
 import { Button } from "@/components/ui/button";
-import { Authenticated } from "convex/react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Sidebar,
   SidebarContent,
@@ -15,14 +14,10 @@ import {
   SidebarMenu,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { SidebarHistory } from "@/components/sidebar-history";
-import { Id } from "@/convex/_generated/dataModel";
+import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-interface AppSidebarProps {
-  userId: Id<"users"> | null;
-}
-
-export function AppSidebar({ userId }: AppSidebarProps) {
+export function AppSidebar({ user }: { user: User | undefined }) {
   const router = useRouter();
   const { setOpenMobile } = useSidebar();
 
@@ -33,11 +28,13 @@ export function AppSidebar({ userId }: AppSidebarProps) {
           <div className="flex flex-row justify-between items-center">
             <Link
               href="/"
-              onClick={() => setOpenMobile(false)}
+              onClick={() => {
+                setOpenMobile(false);
+              }}
               className="flex flex-row gap-3 items-center"
             >
               <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer">
-                OpenChat
+                Chatbot
               </span>
             </Link>
             <Tooltip>
@@ -48,7 +45,7 @@ export function AppSidebar({ userId }: AppSidebarProps) {
                   className="p-2 h-fit"
                   onClick={() => {
                     setOpenMobile(false);
-                    router.push("/chat");
+                    router.push("/");
                     router.refresh();
                   }}
                 >
@@ -60,16 +57,10 @@ export function AppSidebar({ userId }: AppSidebarProps) {
           </div>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent className="px-2">
-        <SidebarContent>
-          <SidebarHistory userId={userId} />
-        </SidebarContent>
+      <SidebarContent>
+        <SidebarHistory user={user} />
       </SidebarContent>
-      <SidebarFooter className="p-2">
-        <Authenticated>
-          <SidebarUserNav />
-        </Authenticated>
-      </SidebarFooter>
+      <SidebarFooter>{user && <SidebarUserNav user={user} />}</SidebarFooter>
     </Sidebar>
   );
 }

@@ -19,7 +19,7 @@ function PureChatHeader({
   selectedModelId,
   selectedVisibilityType,
 }: {
-  chatId: string | Id<"chats">;
+  chatId: Id<"chats">;
   selectedModelId: string;
   selectedVisibilityType: VisibilityType;
 }) {

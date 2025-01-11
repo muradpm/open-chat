@@ -4,6 +4,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const saveChat = mutation({
   args: {
+    userId: v.id("users"),
     title: v.string(),
   },
   handler: async (ctx, args) => {
@@ -12,7 +13,7 @@ export const saveChat = mutation({
 
     return await ctx.db.insert("chats", {
       title: args.title,
-      userId,
+      userId: args.userId,
       visibility: "private",
       createdAt: Date.now(),
     });

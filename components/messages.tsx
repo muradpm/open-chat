@@ -5,11 +5,12 @@ import { memo } from "react";
 import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
 import { PreviewMessage, ThinkingMessage } from "./message";
 import equal from "fast-deep-equal";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface MessagesProps {
   messages: Array<Message>;
   isLoading: boolean;
-  chatId: string;
+  chatId: Id<"chats">;
   setMessages: (messages: Message[] | ((messages: Message[]) => Message[])) => void;
   reload: (chatRequestOptions?: ChatRequestOptions) => Promise<string | null | undefined>;
   isReadonly?: boolean;

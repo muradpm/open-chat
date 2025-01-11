@@ -8,7 +8,7 @@ import { Id } from "@/convex/_generated/dataModel";
 export type VisibilityType = "private" | "public";
 
 interface UseChatVisibilityProps {
-  chatId: string | Id<"chats">;
+  chatId: Id<"chats">;
   initialVisibility: VisibilityType;
 }
 

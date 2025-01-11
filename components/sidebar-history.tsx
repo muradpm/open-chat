@@ -4,11 +4,11 @@ import { isToday, isYesterday, subMonths, subWeeks } from "date-fns";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
+import type { User } from "@auth/core/types";
 import { useQuery, useMutation } from "convex/react";
 import { Id } from "@/convex/_generated/dataModel";
 import { memo, useState } from "react";
 import { toast } from "sonner";
-
 import {
   CheckCircleFillIcon,
   GlobeIcon,
@@ -48,37 +48,19 @@ import {
 } from "@/components/ui/sidebar";
 import { useChatVisibility } from "@/hooks/use-chat-visibility";
 
+type Chat = {
+  id: Id<"chats">;
+  title: string;
+  visibility: "public" | "private";
+  createdAt: number;
+};
+
 type GroupedChats = {
-  today: Array<{
-    id: Id<"chats">;
-    title: string;
-    visibility: "public" | "private";
-    createdAt: number;
-  }>;
-  yesterday: Array<{
-    id: Id<"chats">;
-    title: string;
-    visibility: "public" | "private";
-    createdAt: number;
-  }>;
-  lastWeek: Array<{
-    id: Id<"chats">;
-    title: string;
-    visibility: "public" | "private";
-    createdAt: number;
-  }>;
-  lastMonth: Array<{
-    id: Id<"chats">;
-    title: string;
-    visibility: "public" | "private";
-    createdAt: number;
-  }>;
-  older: Array<{
-    id: Id<"chats">;
-    title: string;
-    visibility: "public" | "private";
-    createdAt: number;
-  }>;
+  today: Array<Chat>;
+  yesterday: Array<Chat>;
+  lastWeek: Array<Chat>;
+  lastMonth: Array<Chat>;
+  older: Array<Chat>;
 };
 
 const PureChatItem = ({
@@ -87,12 +69,7 @@ const PureChatItem = ({
   onDelete,
   setOpenMobile,
 }: {
-  chat: {
-    id: Id<"chats">;
-    title: string;
-    visibility: "public" | "private";
-    createdAt: number;
-  };
+  chat: Chat;
   isActive: boolean;
   onDelete: (chatId: Id<"chats">) => void;
   setOpenMobile: (open: boolean) => void;
@@ -175,18 +152,11 @@ export const ChatItem = memo(PureChatItem, (prevProps, nextProps) => {
   return true;
 });
 
-export function SidebarHistory({ userId }: { userId: Id<"users"> | null }) {
+export function SidebarHistory({ user }: { user: User | undefined }) {
   const { setOpenMobile } = useSidebar();
   const { id } = useParams();
 
-  const history =
-    useQuery(api.chats.getChatsByUserId, userId ? { userId } : "skip")?.map((chat) => ({
-      id: chat._id,
-      title: chat.title,
-      visibility: chat.visibility,
-      createdAt: chat.createdAt,
-    })) ?? [];
-  const deleteChatMutation = useMutation(api.chats.deleteChatById);
+  const deleteChat = useMutation(api.chats.deleteChatById);
 
   const [deleteId, setDeleteId] = useState<Id<"chats"> | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -194,7 +164,7 @@ export function SidebarHistory({ userId }: { userId: Id<"users"> | null }) {
   const handleDelete = async () => {
     if (!deleteId) return;
 
-    toast.promise(deleteChatMutation({ id: deleteId }), {
+    toast.promise(deleteChat({ id: deleteId }), {
       loading: "Deleting chat...",
       success: () => "Chat deleted successfully",
       error: "Failed to delete chat",
@@ -207,7 +177,17 @@ export function SidebarHistory({ userId }: { userId: Id<"users"> | null }) {
     }
   };
 
-  if (!userId) {
+  const history = useQuery(
+    api.chats.getChatsByUserId,
+    user ? { userId: user.id as Id<"users"> } : "skip"
+  )?.map((chat) => ({
+    id: chat._id,
+    title: chat.title,
+    visibility: chat.visibility,
+    createdAt: chat.createdAt,
+  }));
+
+  if (!user) {
     return (
       <SidebarGroup>
         <SidebarGroupContent>

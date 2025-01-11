@@ -41,7 +41,7 @@ export function VisibilitySelector({
   className,
   selectedVisibilityType,
 }: {
-  chatId: string | Id<"chats">;
+  chatId: Id<"chats">;
   selectedVisibilityType: VisibilityType;
 } & React.ComponentProps<typeof Button>) {
   const [open, setOpen] = useState(false);

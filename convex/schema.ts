@@ -59,4 +59,5 @@ const schema = defineSchema({
     .index("by_user", ["userId"])
     .index("by_resolved", ["isResolved"]),
 });
+
 export default schema;

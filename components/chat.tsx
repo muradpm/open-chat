@@ -15,7 +15,7 @@ function PureChat({
   selectedModelId,
   selectedVisibilityType,
 }: {
-  id: string | Id<"chats">;
+  id: Id<"chats">;
   initialMessages: Array<Message>;
   selectedModelId: string;
   selectedVisibilityType: VisibilityType;
