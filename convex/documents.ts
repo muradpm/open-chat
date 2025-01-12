@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
@@ -11,7 +11,7 @@ export const saveDocument = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     return await ctx.db.insert("documents", {
       ...args,
@@ -44,7 +44,7 @@ export const createSuggestion = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     return await ctx.db.insert("suggestions", {
       ...args,
@@ -68,14 +68,13 @@ export const saveSuggestions = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     // Verify document exists and user has access
     const doc = await ctx.db.get(args.suggestions[0].documentId);
-    if (!doc) throw new Error("Document not found");
-    if (doc.userId !== userId) throw new Error("Unauthorized");
+    if (!doc) throw new ConvexError("Document not found");
+    if (doc.userId !== userId) throw new ConvexError("Unauthorized");
 
-    // Insert all suggestions
     const timestamp = Date.now();
     const suggestionIds = await Promise.all(
       args.suggestions.map((suggestion) =>

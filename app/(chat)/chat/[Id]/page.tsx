@@ -10,9 +10,15 @@ import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 
 export default async function Page(props: { params: Promise<{ id: Id<"chats"> }> }) {
   const params = await props.params;
-  const chat = await fetchQuery(api.chats.getChatById, {
-    id: params.id,
-  });
+  const { id } = params;
+
+  const chat = await fetchQuery(
+    api.chats.getChatById,
+    {
+      id: id,
+    },
+    { token: await convexAuthNextjsToken() }
+  );
 
   if (!chat) {
     notFound();
@@ -34,9 +40,13 @@ export default async function Page(props: { params: Promise<{ id: Id<"chats"> }>
     }
   }
 
-  const messagesFromDb = await fetchQuery(api.messages.getMessagesByChatId, {
-    chatId: chat._id,
-  });
+  const messagesFromDb = await fetchQuery(
+    api.messages.getMessagesByChatId,
+    {
+      chatId: chat._id,
+    },
+    { token: await convexAuthNextjsToken() }
+  );
 
   const cookieStore = await cookies();
   const modelIdFromCookie = cookieStore.get("model-id")?.value;
@@ -44,11 +54,13 @@ export default async function Page(props: { params: Promise<{ id: Id<"chats"> }>
     models.find((model) => model.id === modelIdFromCookie)?.id || DEFAULT_MODEL_NAME;
 
   return (
-    <Chat
-      id={chat._id}
-      initialMessages={convertToUIMessages(messagesFromDb)}
-      selectedModelId={selectedModelId}
-      selectedVisibilityType={chat.visibility}
-    />
+    <>
+      <Chat
+        id={chat._id}
+        initialMessages={convertToUIMessages(messagesFromDb)}
+        selectedModelId={selectedModelId}
+        selectedVisibilityType={chat.visibility}
+      />
+    </>
   );
 }

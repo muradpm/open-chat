@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
@@ -9,7 +9,7 @@ export const saveChat = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     return await ctx.db.insert("chats", {
       title: args.title,
@@ -24,7 +24,7 @@ export const getChatById = query({
   args: { id: v.id("chats") },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     const chat = await ctx.db.get(args.id);
     if (!chat) return null;
@@ -42,7 +42,7 @@ export const getChatsByUserId = query({
   },
   handler: async (ctx, args) => {
     const currentUserId = await getAuthUserId(ctx);
-    if (!currentUserId) throw new Error("Not authenticated");
+    if (!currentUserId) throw new ConvexError("Not authenticated");
 
     return await ctx.db
       .query("chats")
@@ -62,11 +62,11 @@ export const deleteChatById = mutation({
   args: { id: v.id("chats") },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     const chat = await ctx.db.get(args.id);
     if (!chat || chat.userId !== userId) {
-      throw new Error("Unauthorized");
+      throw new ConvexError("Unauthorized");
     }
 
     await ctx.db
@@ -96,11 +96,11 @@ export const updateChatVisibility = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     const chat = await ctx.db.get(args.id);
     if (!chat || chat.userId !== userId) {
-      throw new Error("Unauthorized");
+      throw new ConvexError("Unauthorized");
     }
 
     return await ctx.db.patch(args.id, {

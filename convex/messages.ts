@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
@@ -6,7 +6,7 @@ export const getMessageById = query({
   args: { id: v.id("messages") },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     const message = await ctx.db.get(args.id);
     if (!message) return null;
@@ -38,11 +38,11 @@ export const deleteMessagesByChatId = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     const chat = await ctx.db.get(args.chatId);
     if (!chat || chat.userId !== userId) {
-      throw new Error("Unauthorized");
+      throw new ConvexError("Unauthorized");
     }
 
     const messages = await ctx.db
@@ -69,11 +69,11 @@ export const saveMessages = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     const chat = await ctx.db.get(args.messages[0].chatId);
-    if (!chat) throw new Error("Chat not found");
-    if (chat.userId !== userId) throw new Error("Unauthorized");
+    if (!chat) throw new ConvexError("Chat not found");
+    if (chat.userId !== userId) throw new ConvexError("Unauthorized");
 
     const timestamp = Date.now();
     const messageIds = await Promise.all(
@@ -97,16 +97,16 @@ export const voteMessage = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     const [chat, message] = await Promise.all([
       ctx.db.get(args.chatId),
       ctx.db.get(args.messageId),
     ]);
 
-    if (!chat || !message) throw new Error("Chat or message not found");
+    if (!chat || !message) throw new ConvexError("Chat or message not found");
     if (message.chatId !== args.chatId)
-      throw new Error("Message does not belong to chat");
+      throw new ConvexError("Message does not belong to chat");
 
     const existingVote = await ctx.db
       .query("votes")
@@ -135,12 +135,12 @@ export const getVotesByChatId = query({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) throw new ConvexError("Not authenticated");
 
     const chat = await ctx.db.get(args.chatId);
-    if (!chat) throw new Error("Chat not found");
+    if (!chat) throw new ConvexError("Chat not found");
     if (chat.visibility !== "public" && chat.userId !== userId) {
-      throw new Error("Unauthorized");
+      throw new ConvexError("Unauthorized");
     }
 
     return await ctx.db

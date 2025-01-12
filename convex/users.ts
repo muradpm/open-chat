@@ -1,5 +1,6 @@
 import { getAuthUserId, getAuthSessionId } from "@convex-dev/auth/server";
 import { query } from "./_generated/server";
+import { ConvexError } from "convex/values";
 
 export const getAuthenticatedUser = query({
   args: {},
@@ -19,7 +20,7 @@ export const getAuthenticatedUser = query({
     ]);
 
     if (!user || !session) {
-      throw new Error("User or session not found");
+      throw new ConvexError("User or session not found");
     }
 
     return {
@@ -39,7 +40,7 @@ export const getUserProfile = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new Error("Not authenticated");
+      throw new ConvexError("Not authenticated");
     }
 
     const user = await ctx.db
@@ -48,7 +49,7 @@ export const getUserProfile = query({
       .unique();
 
     if (!user) {
-      throw new Error("User not found");
+      throw new ConvexError("User not found");
     }
 
     return user;
