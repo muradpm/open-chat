@@ -7,8 +7,15 @@ import { PreviewMessage, ThinkingMessage } from "./message";
 import equal from "fast-deep-equal";
 import { Id } from "@/convex/_generated/dataModel";
 
+type Vote = {
+  messageId: Id<"messages">;
+  chatId: Id<"chats">;
+  isUpvoted: boolean;
+};
+
 interface MessagesProps {
   messages: Array<Message>;
+  votes: Array<Vote> | undefined;
   isLoading: boolean;
   chatId: Id<"chats">;
   setMessages: (messages: Message[] | ((messages: Message[]) => Message[])) => void;
@@ -18,11 +25,12 @@ interface MessagesProps {
 
 function PureMessages({
   messages,
+  votes,
   isLoading,
   chatId,
   setMessages,
   reload,
-  isReadonly = false,
+  isReadonly,
 }: MessagesProps) {
   const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>();
 
@@ -31,12 +39,13 @@ function PureMessages({
       ref={messagesContainerRef}
       className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4"
     >
-      {messages.map((message) => (
+      {messages.map((message, index) => (
         <PreviewMessage
           key={message.id}
           chatId={chatId}
           message={message}
-          isLoading={isLoading}
+          isLoading={isLoading && messages.length - 1 === index}
+          vote={votes ? votes.find((vote) => vote.messageId === message.id) : undefined}
           setMessages={setMessages}
           reload={reload}
           isReadonly={isReadonly}
@@ -54,8 +63,9 @@ function PureMessages({
 
 export const Messages = memo(PureMessages, (prevProps, nextProps) => {
   if (prevProps.isLoading !== nextProps.isLoading) return false;
+  if (prevProps.isLoading && nextProps.isLoading) return false;
   if (prevProps.messages.length !== nextProps.messages.length) return false;
-  if (prevProps.chatId !== nextProps.chatId) return false;
-  if (prevProps.isReadonly !== nextProps.isReadonly) return false;
+  if (!equal(prevProps.votes, nextProps.votes)) return false;
+
   return equal(prevProps.messages, nextProps.messages);
 });

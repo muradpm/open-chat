@@ -10,7 +10,7 @@ export const getAuthenticatedUser = query({
     ]);
 
     if (!userId || !sessionId) {
-      throw new Error("Not authenticated");
+      return null;
     }
 
     const [user, session] = await Promise.all([

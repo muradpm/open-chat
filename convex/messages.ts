@@ -88,3 +88,64 @@ export const saveMessages = mutation({
     return messageIds;
   },
 });
+
+export const voteMessage = mutation({
+  args: {
+    chatId: v.id("chats"),
+    messageId: v.id("messages"),
+    isUpvoted: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const [chat, message] = await Promise.all([
+      ctx.db.get(args.chatId),
+      ctx.db.get(args.messageId),
+    ]);
+
+    if (!chat || !message) throw new Error("Chat or message not found");
+    if (message.chatId !== args.chatId)
+      throw new Error("Message does not belong to chat");
+
+    const existingVote = await ctx.db
+      .query("votes")
+      .withIndex("by_chat_message", (q) =>
+        q.eq("chatId", args.chatId).eq("messageId", args.messageId)
+      )
+      .unique();
+
+    if (existingVote) {
+      return await ctx.db.patch(existingVote._id, {
+        isUpvoted: args.isUpvoted,
+      });
+    }
+
+    return await ctx.db.insert("votes", {
+      chatId: args.chatId,
+      messageId: args.messageId,
+      isUpvoted: args.isUpvoted,
+    });
+  },
+});
+
+export const getVotesByChatId = query({
+  args: {
+    chatId: v.id("chats"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const chat = await ctx.db.get(args.chatId);
+    if (!chat) throw new Error("Chat not found");
+    if (chat.visibility !== "public" && chat.userId !== userId) {
+      throw new Error("Unauthorized");
+    }
+
+    return await ctx.db
+      .query("votes")
+      .withIndex("by_chat_message", (q) => q.eq("chatId", args.chatId))
+      .collect();
+  },
+});

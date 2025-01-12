@@ -4,10 +4,10 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const saveDocument = mutation({
   args: {
-    id: v.string(),
+    id: v.id("documents"),
     title: v.string(),
     kind: v.union(v.literal("text"), v.literal("code")),
-    content: v.optional(v.string()),
+    content: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -21,9 +21,9 @@ export const saveDocument = mutation({
   },
 });
 
-export const getUserDocuments = query({
-  args: {},
-  handler: async (ctx) => {
+export const getDocumentById = query({
+  args: { id: v.id("documents") },
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 

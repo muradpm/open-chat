@@ -8,6 +8,8 @@ import { memo, useState } from "react";
 import type { Attachment, Message } from "ai";
 import { VisibilityType } from "@/hooks/use-chat-visibility";
 import { Id } from "@/convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
 
 function PureChat({
   id,
@@ -20,7 +22,6 @@ function PureChat({
   selectedModelId: string;
   selectedVisibilityType: VisibilityType;
 }) {
-  const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const {
     messages,
     input,
@@ -41,6 +42,10 @@ function PureChat({
     },
   });
 
+  const votes = useQuery(api.messages.getVotesByChatId, id ? { chatId: id } : "skip");
+
+  const [attachments, setAttachments] = useState<Array<Attachment>>([]);
+
   return (
     <div className="flex flex-col min-w-0 h-dvh bg-background">
       <ChatHeader
@@ -49,9 +54,10 @@ function PureChat({
         selectedVisibilityType={selectedVisibilityType}
       />
       <Messages
-        messages={messages}
-        isLoading={isLoading}
         chatId={id}
+        isLoading={isLoading}
+        votes={votes}
+        messages={messages}
         setMessages={setMessages}
         reload={reload}
       />
@@ -60,6 +66,7 @@ function PureChat({
           chatId={id}
           input={input}
           setInput={setInput}
+          handleSubmit={handleSubmit}
           isLoading={isLoading}
           stop={stop}
           attachments={attachments}
@@ -67,7 +74,6 @@ function PureChat({
           messages={messages}
           setMessages={setMessages}
           append={append}
-          handleSubmit={handleSubmit}
         />
       </form>
     </div>

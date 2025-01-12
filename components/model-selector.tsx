@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { models } from "@/lib/models";
+import { models } from "@/lib/ai/models";
 import { cn } from "@/lib/utils";
 
 import { CheckCircleFillIcon, ChevronDownIcon } from "./icons";
@@ -21,8 +21,7 @@ export function ModelSelector({
   selectedModelId: string;
 } & React.ComponentProps<typeof Button>) {
   const [open, setOpen] = useState(false);
-  const [optimisticModelId, setOptimisticModelId] =
-    useOptimistic(selectedModelId);
+  const [optimisticModelId, setOptimisticModelId] = useOptimistic(selectedModelId);
 
   const selectedModel = useMemo(
     () => models.find((model) => model.id === optimisticModelId),
@@ -61,9 +60,7 @@ export function ModelSelector({
             <div className="flex flex-col gap-1 items-start">
               {model.label}
               {model.description && (
-                <div className="text-xs text-muted-foreground">
-                  {model.description}
-                </div>
+                <div className="text-xs text-muted-foreground">{model.description}</div>
               )}
             </div>
             <div className="text-foreground dark:text-foreground opacity-0 group-data-[active=true]/item:opacity-100">

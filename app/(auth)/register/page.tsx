@@ -33,7 +33,7 @@ export default function RegisterPage() {
               className="hidden dark:block"
               priority
             />
-            <h1 className="text-2xl font-semibold tracking-tight">Create</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Welcome</h1>
             <p className="text-sm text-muted-foreground">
               Create account to get started.
             </p>

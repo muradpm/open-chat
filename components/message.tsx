@@ -9,26 +9,35 @@ import { MemoizedMarkdown } from "./memoized-markdown";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { PencilEditIcon } from "@/components/icons";
+import equal from "fast-deep-equal";
 import { MessageEditor } from "@/components/message-editor";
+import { MessageActions } from "@/components/message-actions";
+import { PreviewAttachment } from "@/components/preview-attachment";
 import { Id } from "@/convex/_generated/dataModel";
 
-interface PreviewMessageProps {
+type Vote = {
+  messageId: Id<"messages">;
   chatId: Id<"chats">;
-  message: Message;
-  isLoading: boolean;
-  setMessages: (messages: Message[] | ((messages: Message[]) => Message[])) => void;
-  reload: (chatRequestOptions?: ChatRequestOptions) => Promise<string | null | undefined>;
-  isReadonly?: boolean;
-}
+  isUpvoted: boolean;
+};
 
 const PurePreviewMessage = ({
   chatId,
   message,
+  vote,
   isLoading,
   setMessages,
   reload,
   isReadonly = false,
-}: PreviewMessageProps) => {
+}: {
+  chatId: Id<"chats">;
+  message: Message;
+  vote: Vote | undefined;
+  isLoading: boolean;
+  setMessages: (messages: Message[] | ((messages: Message[]) => Message[])) => void;
+  reload: (chatRequestOptions?: ChatRequestOptions) => Promise<string | null | undefined>;
+  isReadonly?: boolean;
+}) => {
   const [mode, setMode] = useState<"view" | "edit">("view");
 
   return (
@@ -57,6 +66,14 @@ const PurePreviewMessage = ({
           )}
 
           <div className="flex flex-col gap-2 w-full">
+            {message.experimental_attachments && (
+              <div className="flex flex-row justify-end gap-2">
+                {message.experimental_attachments.map((attachment) => (
+                  <PreviewAttachment key={attachment.url} attachment={attachment} />
+                ))}
+              </div>
+            )}
+
             {message.content && mode === "view" && (
               <div className="flex flex-row gap-2 items-start">
                 {message.role === "user" && !isReadonly && (
@@ -90,12 +107,23 @@ const PurePreviewMessage = ({
               <div className="flex flex-row gap-2 items-start">
                 <div className="size-8" />
                 <MessageEditor
+                  key={message.id}
                   message={message}
                   setMode={setMode}
                   setMessages={setMessages}
                   reload={reload}
                 />
               </div>
+            )}
+
+            {!isReadonly && (
+              <MessageActions
+                key={`action-${message.id}`}
+                chatId={chatId}
+                message={message}
+                vote={vote}
+                isLoading={isLoading}
+              />
             )}
           </div>
         </div>
@@ -107,6 +135,10 @@ const PurePreviewMessage = ({
 export const PreviewMessage = memo(PurePreviewMessage, (prevProps, nextProps) => {
   if (prevProps.isLoading !== nextProps.isLoading) return false;
   if (prevProps.message.content !== nextProps.message.content) return false;
+  if (!equal(prevProps.message.toolInvocations, nextProps.message.toolInvocations))
+    return false;
+  if (!equal(prevProps.vote, nextProps.vote)) return false;
+
   return true;
 });
 

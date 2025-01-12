@@ -14,13 +14,11 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { useLocalStorage, useWindowSize } from "usehooks-ts";
-
 import { cn, sanitizeUIMessages } from "@/lib/utils";
-
 import { ArrowUpIcon, PaperclipIcon, StopIcon } from "./icons";
-import { PreviewAttachment } from "./preview-attachment";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
+import { PreviewAttachment } from "@/components/preview-attachment";
 import { SuggestedActions } from "@/components/suggested-actions";
 import equal from "fast-deep-equal";
 import { Id } from "@/convex/_generated/dataModel";
